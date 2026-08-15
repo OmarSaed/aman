@@ -27,6 +27,8 @@ services:
       dockerfile: Dockerfile
     container_name: aman_backend
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-aman_user}:${POSTGRES_PASSWORD:-aman_pass}@postgres:5432/${POSTGRES_DB:-aman_erp}
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
