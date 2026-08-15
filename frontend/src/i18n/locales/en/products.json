@@ -1,0 +1,125 @@
+{
+  "title": "Inventory Master List",
+  "subtitle": "Comprehensive oversight of product catalogs, barcodes, and pricing strategies.",
+  "newProduct": "Register Product",
+  "massImport": "Mass Import",
+  "editItem": "Edit Item",
+  "createNewItem": "Create New Item",
+  "editProductSpecs": "Edit Product Specs",
+  "newProductRegistration": "New Product Registration",
+  "configureItem": "Configure item attributes and pricing models.",
+  "products": "Products",
+
+  "list": {
+    "searchPlaceholder": "Search by name or SKU...",
+    "category": "Category",
+    "brand": "Brand",
+    "allCategories": "All Categories",
+    "allBrands": "All Brands",
+    "productIdentity": "Product Identity",
+    "pricing": "Pricing (Retail / Whls)",
+    "cost": "Cost",
+    "availableStock": "Available Stock",
+    "actions": "Actions",
+    "noRecords": "No records discovered",
+    "trade": "Trade"
+  },
+
+  "form": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "update": "Update",
+    "identity": "Product Identity",
+    "productLabel": "Product Label",
+    "barcode": "Barcode",
+    "pricingEngine": "Pricing & Markup Engine",
+    "internalCost": "Internal Cost",
+    "costNote": "Computed price will auto-update based on your chosen profit margin.",
+    "retailPricing": "RETAIL PRICING",
+    "profitPercent": "Profit %",
+    "finalPrice": "Final Price",
+    "wholesalePricing": "WHOLESALE PRICING",
+    "wholesaleMarkup": "Wholesale Markup %",
+    "wholesalePrice": "Wholesale Price",
+    "unitsPerBox": "Units per wholesale box",
+    "productTagline": "PRODUCT TAGLINE",
+    "taglinePlaceholder": "Brief summary for invoices and listings...",
+    "technicalSpecs": "DETAILED TECHNICAL SPECIFICATIONS",
+    "specsPlaceholder": "Dimensions, weight, material, etc...",
+    "specsStory": "Specifications & Story",
+    "initialStock": "Initial Stock Intake",
+    "editStockNote": "Stock is managed from the Inventory module after product creation.",
+    "addWarehouse": "+ Add Warehouse",
+    "storageNode": "Storage Node",
+    "selectLocation": "Select Location...",
+    "qty": "Qty",
+    "availability": "AVAILABILITY",
+    "isActive": "Is Active",
+    "classification": "CLASSIFICATION",
+    "categoryLabel": "Category",
+    "brandLabel": "Brand",
+    "images": "PRODUCT IMAGES",
+    "mainImage": "Main Image URL",
+    "lowStockAlert": "LOW STOCK ALERT",
+    "lowStockThreshold": "Alert Threshold (units)"
+  },
+
+  "actions": {
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+
+  "confirm": {
+    "deleteTitle": "Authorize Deletion",
+    "deleteMessage": "You are about to remove \"{{name}}\". This is permanent.",
+    "caution": "Caution: This modification is irreversible.",
+    "keepData": "Keep Data",
+    "confirmDelete": "Execute Deletion"
+  },
+
+  "toast": {
+    "created": "Product registered successfully",
+    "updated": "Product record updated",
+    "deleted": "Product successfully removed",
+    "deletionFailed": "Deletion failed",
+    "categoryAdded": "Category added",
+    "brandAdded": "Brand added"
+  },
+
+  "categories": {
+    "title": "Product Categories",
+    "subtitle": "Organize your catalog with structured classification groups",
+    "newCategory": "Add Category",
+    "editCategory": "Edit Category",
+    "name": "Category Name",
+    "description": "Description (optional)",
+    "parentCategory": "Parent Category",
+    "noParent": "Top-level category",
+    "products": "Products",
+    "actions": "Actions",
+    "noCategories": "No categories defined yet",
+    "confirmDelete": "Delete this category?"
+  },
+
+  "brands": {
+    "title": "Brand Registry",
+    "subtitle": "Manage manufacturer and vendor brand identifiers",
+    "newBrand": "Add Brand",
+    "editBrand": "Edit Brand",
+    "name": "Brand Name",
+    "description": "Description (optional)",
+    "products": "Products",
+    "actions": "Actions",
+    "noBrands": "No brands registered yet",
+    "confirmDelete": "Delete this brand?"
+  },
+
+  "import": {
+    "title": "Bulk Product Import",
+    "dropzone": "Drag & drop your CSV file here, or click to browse",
+    "template": "Download Template",
+    "import": "Import Products",
+    "importing": "Importing...",
+    "success": "Products imported successfully"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "title": "Platform Configuration",
+  "subtitle": "Manage global system preferences, taxation, and legal company identifiers.",
+  "systemSettings": "System Settings",
+  "companyProfile": "Business Profile",
+  "warehouses": "Warehouses & Stores",
+
+  "system": {
+    "inventoryTitle": "Inventory & Fulfillment",
+    "allowNegativeStock": "Allow Negative Stock Operations",
+    "lowStockThreshold": "Default low stock threshold",
+    "lowStockHelper": "Alerting level for re-ordering.",
+    "pricingStrategy": "Default Cost Calculation",
+    "strategyAverage": "Rolling Average",
+    "strategyHighest": "Peak Purchase Price",
+    "strategyLowest": "Bottom Purchase Price",
+    "fiscalTitle": "Fiscal & Currency",
+    "taxPercentage": "Default VAT/Sales Tax",
+    "currency": "Standard Base Currency (ISO)",
+    "exchangeRate": "Exchange Rate (LBP/USD)",
+    "exchangeRateHelper": "Default exchange rate for Lebanese Pound",
+    "enableWholesale": "Enable Wholesale Pricing Logic",
+    "applyConfig": "Apply Configuration",
+    "saved": "System preferences saved"
+  },
+
+  "company": {
+    "identityTitle": "Corporate Identity",
+    "entityName": "Legal Entity Name",
+    "taxNumber": "Tax Registration #",
+    "contactTitle": "Location & Contacts",
+    "address": "Physical Address",
+    "email": "Public Email",
+    "phone": "Contact Phone",
+    "website": "Digital Website",
+    "invoicingTitle": "Invoicing & POS Data",
+    "invoiceHeader": "Invoice Header Text",
+    "invoiceFooter": "Invoice Footer Message",
+    "posMessage": "POS Receipt Message",
+    "brandingTitle": "Interface Branding",
+    "primaryColor": "Primary Hex",
+    "secondaryColor": "Secondary Hex",
+    "updateProfile": "Update Global Profile",
+    "saved": "Company profile updated"
+  },
+
+  "warehouse": {
+    "title": "Storage Nodes & Warehouses",
+    "addNew": "New Storage node",
+    "nodeName": "Node Name",
+    "nodeType": "Node Type",
+    "typeWarehouse": "Warehouse",
+    "typeShowroom": "Showroom",
+    "location": "Address / Location",
+    "addDialog": "Add New Storage Node",
+    "save": "Save Details",
+    "name": "Name",
+    "type": "Type",
+    "locationCol": "Location",
+    "actions": "Actions",
+    "added": "Storage node added successfully",
+    "nameExists": "Warehouse name already exists"
+  }
+}

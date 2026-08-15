@@ -1,0 +1,125 @@
+{
+  "title": "دليل الأصناف والأسعار",
+  "subtitle": "إدارة بيانات المنتجات، الباركود، وإستراتيجيات التسعير",
+  "newProduct": "منتج جديد",
+  "massImport": "استيراد CSV",
+  "editItem": "تعديل صنف",
+  "createNewItem": "إضافة صنف جديد",
+  "editProductSpecs": "تعديل مواصفات المنتج",
+  "newProductRegistration": "إنشاء منتج جديد",
+  "configureItem": "قم بتعبئة بيانات الصنف بدقة لضمان دقة التقارير",
+  "products": "المنتجات",
+
+  "list": {
+    "searchPlaceholder": "البحث بالاسم أو SKU...",
+    "category": "التصنيف",
+    "brand": "الماركة",
+    "allCategories": "كل التصنيفات",
+    "allBrands": "كل الماركات",
+    "productIdentity": "المنتج والهوية",
+    "pricing": "التسعير (بيع / جملة)",
+    "cost": "التكلفة",
+    "availableStock": "الرصيد",
+    "actions": "إجراءات",
+    "noRecords": "لا توجد منتجات",
+    "trade": "تجاري"
+  },
+
+  "form": {
+    "cancel": "إلغاء",
+    "save": "حفظ البيانات",
+    "update": "تحديث البيانات",
+    "identity": "هوية المنتج",
+    "productLabel": "اسم المنتج",
+    "barcode": "باركود (Barcode)",
+    "pricingEngine": "استراتيجية التسعير والمضاعفات",
+    "internalCost": "تكلفة الشراء (Cost)",
+    "costNote": "السعر المحتسب سيتم تحديثه تلقائياً بناء على نسبة الربح المختارة.",
+    "retailPricing": "سعر البيع للجمهور",
+    "profitPercent": "نسبة الربح %",
+    "finalPrice": "السعر النهائي",
+    "wholesalePricing": "سعر الجملة",
+    "wholesaleMarkup": "هامش ربح الجملة %",
+    "wholesalePrice": "سعر الجملة",
+    "unitsPerBox": "كمية الصندوق (الوحدات)",
+    "productTagline": "نبذة عن المنتج",
+    "taglinePlaceholder": "اكتب نبذة مختصرة تظهر في الفواتير والقوائم...",
+    "technicalSpecs": "المواصفات التقنية الكاملة",
+    "specsPlaceholder": "أدخل الأبعاد، الوزن، المادة، أو أي تفاصيل تقنية أخرى...",
+    "specsStory": "المواصفات والوصف",
+    "initialStock": "رصيد أول المدة",
+    "editStockNote": "يتم إدارة المخزون من قسم المستودعات بعد إنشاء المنتج.",
+    "addWarehouse": "+ إضافة مخزن",
+    "storageNode": "الموقع / المخزن",
+    "selectLocation": "اختر موقع...",
+    "qty": "الكمية",
+    "availability": "حالة التوافر",
+    "isActive": "نشط",
+    "classification": "التصنيف",
+    "categoryLabel": "التصنيف",
+    "brandLabel": "الماركة",
+    "images": "صور المنتج",
+    "mainImage": "رابط الصورة الرئيسية",
+    "lowStockAlert": "تنبيه المخزون المنخفض",
+    "lowStockThreshold": "حد التنبيه (وحدة)"
+  },
+
+  "actions": {
+    "edit": "تعديل",
+    "delete": "حذف"
+  },
+
+  "confirm": {
+    "deleteTitle": "تأكيد الحذف",
+    "deleteMessage": "هل أنت متأكد من حذف \"{{name}}\"؟",
+    "caution": "تنبيه: هذا التعديل لا يمكن التراجع عنه.",
+    "keepData": "الاحتفاظ بالبيانات",
+    "confirmDelete": "حذف نهائي"
+  },
+
+  "toast": {
+    "created": "تم تسجيل المنتج بنجاح",
+    "updated": "تم تحديث بيانات المنتج",
+    "deleted": "تم حذف المنتج",
+    "deletionFailed": "فشل الحذف",
+    "categoryAdded": "تمت إضافة التصنيف",
+    "brandAdded": "تمت إضافة الماركة"
+  },
+
+  "categories": {
+    "title": "تصنيفات المنتجات",
+    "subtitle": "نظّم كتالوجك بمجموعات تصنيف منظمة",
+    "newCategory": "إضافة تصنيف",
+    "editCategory": "تعديل التصنيف",
+    "name": "اسم التصنيف",
+    "description": "الوصف (اختياري)",
+    "parentCategory": "التصنيف الأب",
+    "noParent": "تصنيف رئيسي",
+    "products": "المنتجات",
+    "actions": "إجراءات",
+    "noCategories": "لا توجد تصنيفات بعد",
+    "confirmDelete": "حذف هذا التصنيف؟"
+  },
+
+  "brands": {
+    "title": "سجل الماركات",
+    "subtitle": "إدارة معرّفات ماركات الشركات المصنّعة والموردين",
+    "newBrand": "إضافة ماركة",
+    "editBrand": "تعديل الماركة",
+    "name": "اسم الماركة",
+    "description": "الوصف (اختياري)",
+    "products": "المنتجات",
+    "actions": "إجراءات",
+    "noBrands": "لا توجد ماركات مسجلة بعد",
+    "confirmDelete": "حذف هذه الماركة؟"
+  },
+
+  "import": {
+    "title": "استيراد منتجات بالجملة",
+    "dropzone": "اسحب وأفلت ملف CSV هنا، أو انقر للتصفح",
+    "template": "تحميل القالب",
+    "import": "استيراد المنتجات",
+    "importing": "جارٍ الاستيراد...",
+    "success": "تم استيراد المنتجات بنجاح"
+  }
+}

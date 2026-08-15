@@ -1,0 +1,727 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ─────────────────────────────────────────────────────────────────
+
+enum UIShell {
+  SIDEBAR
+  POS
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  TOGGLE_STATUS
+  ASSIGN_PERMISSIONS
+}
+
+// ─── Roles & Permissions ───────────────────────────────────────────────────
+
+model Role {
+  id            String   @id @default(uuid())
+  name          String   @unique
+  nameAr        String?  @map("name_ar")
+  displayName   String   @map("display_name")
+  displayNameAr String?  @map("display_name_ar")
+  description   String?
+  color         String   @default("#6366f1")
+  isSystem      Boolean  @default(false) @map("is_system")
+  uiShell       UIShell  @default(SIDEBAR) @map("ui_shell")
+  sortOrder     Int      @default(99) @map("sort_order")
+
+  permissions RolePermission[]
+  users       User[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("roles")
+}
+
+model Permission {
+  id        String  @id @default(uuid())
+  key       String  @unique
+  name      String
+  nameAr    String? @map("name_ar")
+  module    String
+  moduleAr  String? @map("module_ar")
+  sortOrder Int     @default(0) @map("sort_order")
+
+  roles RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String @map("role_id")
+  permissionId String @map("permission_id")
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+// ─── Users ─────────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  nameAr        String?   @map("name_ar")
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  roleId        String    @map("role_id")
+  isActive      Boolean   @default(true) @map("is_active")
+  preferredLang String    @default("en") @map("preferred_lang")
+  avatar        String?
+  lastLoginAt   DateTime? @map("last_login_at")
+
+  role          Role           @relation(fields: [roleId], references: [id])
+  refreshTokens RefreshToken[]
+  auditLogs     AuditLog[]
+
+  // Phase 2 Audit Relations
+  createdCategories      Category[]         @relation("CategoryCreator")
+  updatedCategories      Category[]         @relation("CategoryUpdater")
+  createdBrands          Brand[]            @relation("BrandCreator")
+  updatedBrands          Brand[]            @relation("BrandUpdater")
+  createdProducts        Product[]          @relation("ProductCreator")
+  updatedProducts        Product[]          @relation("ProductUpdater")
+  createdWarehouses      Warehouse[]        @relation("WarehouseCreator")
+  updatedWarehouses      Warehouse[]        @relation("WarehouseUpdater")
+  updatedStocks          ProductStock[]     @relation("StockUpdater")
+  createdStockTrans      StockTransaction[] @relation("StockTransactionCreator")
+  createdSuppliers       Supplier[]         @relation("SupplierCreator")
+  updatedSuppliers       Supplier[]         @relation("SupplierUpdater")
+  createdSupplierPrices  SupplierProduct[]  @relation("SupplierPriceCreator")
+  createdPOs             PurchaseOrder[]    @relation("POCreator")
+  updatedPOs             PurchaseOrder[]    @relation("POUpdater")
+  updatedSystemSettings  SystemSetting[]    @relation("SystemSettingUpdater")
+  updatedCompanySettings CompanySetting[]   @relation("CompanySettingUpdater")
+  createdMedia           MediaAsset[]       @relation("MediaCreator")
+
+  // Phase 3 Customers
+  createdCustomers     Customer[]            @relation("CustomerCreator")
+  updatedCustomers     Customer[]            @relation("CustomerUpdater")
+  createdCustomerTrans CustomerTransaction[] @relation("CustomerTransactionCreator")
+
+  // Phase 4 Accounting & Expenses
+  createdExpenseCategories ExpenseCategory[]    @relation("ExpenseCategoryCreator")
+  createdExpenses          Expense[]            @relation("ExpenseCreator")
+  createdSupplierTrans     SupplierTransaction[] @relation("SupplierTransactionCreator")
+  
+  // Sales & Daybox
+  createdOrders            Order[]              @relation("OrderCreator")
+  openedSessions           CashSession[]        @relation("SessionUser")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+// ─── Audit ──────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id          String      @id @default(uuid())
+  userId      String?     @map("user_id")
+  action      AuditAction
+  module      String
+  entityId    String?     @map("entity_id")
+  entityType  String?     @map("entity_type")
+  beforeData  Json?       @map("before_data")
+  afterData   Json?       @map("after_data")
+  ipAddress   String?     @map("ip_address")
+  userAgent   String?     @map("user_agent")
+  description String?
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("audit_logs")
+}
+
+// ─── Settings ───────────────────────────────────────────────────────────────
+
+model Setting {
+  key       String   @id
+  value     String
+  type      String   @default("string")
+  group     String   @default("general")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
+}
+
+// ─── Phase 2 Enums ──────────────────────────────────────────────────────────
+
+enum PricingStrategy {
+  Lowest
+  Highest
+  Average
+}
+
+enum TransactionType {
+  Purchase
+  Sale
+  Transfer
+  Adjustment
+  Return
+}
+
+enum WarehouseType {
+  Warehouse
+  Showroom
+}
+
+enum CustomerType {
+  NORMAL
+  WHOLESALE
+}
+
+enum CustomerTransactionType {
+  PAYMENT
+  SALE
+  RETURN
+  ADJUSTMENT
+}
+
+enum SupplierTransactionType {
+  PAYMENT
+  PURCHASE
+  RETURN
+  ADJUSTMENT
+}
+
+enum OrderStatus {
+  DRAFT
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PARTIAL
+  PAID
+  ON_ACCOUNT
+}
+
+enum CashSessionStatus {
+  OPEN
+  CLOSED
+}
+
+// ─── Settings ───────────────────────────────────────────────────────────────
+
+model SystemSetting {
+  id                       String          @id @default(uuid())
+  defaultPricingStrategy   PricingStrategy @default(Average) @map("default_pricing_strategy")
+  allowNegativeStock       Boolean         @default(false) @map("allow_negative_stock")
+  lowStockThresholdDefault Int             @default(10) @map("low_stock_threshold_default")
+  currency                 String          @default("USD")
+  taxPercentage           Decimal         @default(0) @db.Decimal(5,2) @map("tax_percentage")
+  enableBarcodeScanning    Boolean         @default(true) @map("enable_barcode_scanning")
+  enableWholesalePricing   Boolean         @default(true) @map("enable_wholesale_pricing")
+  exchangeRate             Decimal         @default(1) @db.Decimal(12,4) @map("exchange_rate")
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedBy String?  @map("updated_by")
+
+  updater User? @relation("SystemSettingUpdater", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@map("system_settings")
+}
+
+model CompanySetting {
+  id                   String  @id @default(uuid())
+  companyName          String  @default("My Company") @map("company_name")
+  logoUrl              String? @map("logo_url")
+  address              String?
+  phoneNumber          String? @map("phone_number")
+  email                String?
+  website              String?
+  openingHours         Json?   @map("opening_hours")
+  taxNumber            String? @map("tax_number")
+  currency             String  @default("USD")
+  posFooterMessage     String? @map("pos_footer_message")
+  invoiceHeaderMessage String? @map("invoice_header_message")
+  invoiceFooterMessage String? @map("invoice_footer_message")
+  invoiceTemplate      String? @map("invoice_template") @default("default")
+  theme                String? @default("light")
+  primaryColor         String? @map("primary_color") @default("#6366f1")
+  secondaryColor       String? @map("secondary_color") @default("#8b5cf6")
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedBy String?  @map("updated_by")
+
+  updater User? @relation("CompanySettingUpdater", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@map("company_settings")
+}
+
+// ─── Products & Categories ──────────────────────────────────────────────────
+
+model Category {
+  id               String  @id @default(uuid())
+  name             String
+  description      String?
+  parentCategoryId String? @map("parent_category_id")
+
+  parentCategory Category?  @relation("CategoryToCategory", fields: [parentCategoryId], references: [id], onDelete: SetNull)
+  subCategories  Category[] @relation("CategoryToCategory")
+  products       Product[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String?  @map("created_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedBy String?  @map("updated_by")
+
+  creator User? @relation("CategoryCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater User? @relation("CategoryUpdater", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@map("categories")
+}
+
+model Brand {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+
+  products Product[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String?  @map("created_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedBy String?  @map("updated_by")
+
+  creator User? @relation("BrandCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater User? @relation("BrandUpdater", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@map("brands")
+}
+
+model Product {
+  id               String  @id @default(uuid())
+  name             String
+  sku              String  @unique
+  barcode          String?
+  shortDescription String? @map("short_description")
+  longDescription  String? @map("long_description")
+  imageUrl         String? @map("image_url")
+
+  costPrice                 Decimal @default(0) @db.Decimal(10,2) @map("cost_price")
+  mainPrice                 Decimal @default(0) @db.Decimal(10,2) @map("main_price")
+  wholesalePrice            Decimal @default(0) @db.Decimal(10,2) @map("wholesale_price")
+  wholesaleBoxQuantity      Int     @default(1) @map("wholesale_box_quantity")
+  mainPriceMarkupPercentage Decimal? @db.Decimal(5,2) @map("main_price_markup_percentage")
+  wholesaleMarkupPercentage Decimal? @db.Decimal(5,2) @map("wholesale_markup_percentage")
+
+  overridePricingStrategy PricingStrategy? @map("override_pricing_strategy")
+  isPriceLocked           Boolean @default(true) @map("is_price_locked")
+  lowStockThreshold       Int?    @map("low_stock_threshold")
+
+  categoryId String? @map("category_id")
+  brandId    String? @map("brand_id")
+  isActive   Boolean @default(true) @map("is_active")
+
+  category            Category?            @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  brand               Brand?               @relation(fields: [brandId], references: [id], onDelete: SetNull)
+  stocks              ProductStock[]
+  stockTransactions   StockTransaction[]
+  supplierPrices      SupplierProduct[]
+  purchaseOrderItems  PurchaseOrderItem[]
+  orderItems          OrderItem[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String?  @map("created_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedBy String?  @map("updated_by")
+
+  creator User? @relation("ProductCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater User? @relation("ProductUpdater", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@map("products")
+}
+
+// ─── Inventory ──────────────────────────────────────────────────────────────
+
+model Warehouse {
+  id       String        @id @default(uuid())
+  name     String
+  location String?
+  type     WarehouseType @default(Warehouse)
+
+  stocks            ProductStock[]
+  stockTransactions StockTransaction[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String?  @map("created_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedBy String?  @map("updated_by")
+
+  creator User? @relation("WarehouseCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater User? @relation("WarehouseUpdater", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@map("warehouses")
+}
+
+model ProductStock {
+  id          String   @id @default(uuid())
+  productId   String   @map("product_id")
+  warehouseId String   @map("warehouse_id")
+  quantity    Int      @default(0)
+
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedBy String?  @map("updated_by")
+
+  updater User? @relation("StockUpdater", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@unique([productId, warehouseId])
+  @@map("product_stocks")
+}
+
+model StockTransaction {
+  id              String          @id @default(uuid())
+  productId       String          @map("product_id")
+  warehouseId     String          @map("warehouse_id")
+  quantity        Int             // Positive for ins, negative for outs
+  transactionType TransactionType @map("transaction_type")
+  referenceId     String?         @map("reference_id") // Like PO id or Sale id
+  notes           String?
+
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String?  @map("created_by")
+
+  creator User? @relation("StockTransactionCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@map("stock_transactions")
+}
+
+// ─── Suppliers ──────────────────────────────────────────────────────────────
+
+model Supplier {
+  id          String  @id @default(uuid())
+  name        String
+  contactInfo String? @map("contact_info")
+
+  supplierProducts SupplierProduct[]
+  purchaseOrders   PurchaseOrder[]
+  transactions     SupplierTransaction[]
+  balance          Decimal           @default(0) @db.Decimal(12,2)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String?  @map("created_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedBy String?  @map("updated_by")
+
+  creator User? @relation("SupplierCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater User? @relation("SupplierUpdater", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@map("suppliers")
+}
+
+model SupplierProduct {
+  id            String   @id @default(uuid())
+  supplierId    String?  @map("supplier_id")
+  productId     String   @map("product_id")
+  supplierPrice Decimal  @db.Decimal(10,2) @map("supplier_price")
+  quantity      Int      @default(1)
+  date          DateTime @default(now())
+
+  supplier Supplier? @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdBy String? @map("created_by")
+  creator   User?   @relation("SupplierPriceCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@map("supplier_products")
+}
+
+enum PurchaseOrderStatus {
+  Draft
+  Sent
+  Partial
+  Received
+  Cancelled
+  Returned
+}
+
+model PurchaseOrder {
+  id            String              @id @default(uuid())
+  poNumber      String              @unique @map("po_number")
+  supplierId    String              @map("supplier_id")
+  status        PurchaseOrderStatus @default(Draft)
+  totalAmount   Decimal             @default(0) @db.Decimal(12,2) @map("total_amount")
+  expectedDate  DateTime?           @map("expected_date")
+  notes         String?
+
+  supplier Supplier            @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  items    PurchaseOrderItem[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String?  @map("created_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedBy String?  @map("updated_by")
+
+  creator User? @relation("POCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater User? @relation("POUpdater", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@map("purchase_orders")
+}
+
+model PurchaseOrderItem {
+  id              String  @id @default(uuid())
+  purchaseOrderId String  @map("purchase_order_id")
+  productId       String  @map("product_id")
+  quantityOrdered Int     @map("quantity_ordered")
+  quantityReceived Int    @default(0) @map("quantity_received")
+  unitPrice       Decimal @db.Decimal(10,2) @map("unit_price")
+
+  purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  product       Product       @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@map("purchase_order_items")
+}
+
+// ─── Media Library ────────────────────────────────────────────────────────
+model MediaAsset {
+  id        String   @id @default(uuid())
+  filename  String
+  url       String
+  mimeType  String   @map("mime_type")
+  sizeBytes Int      @map("size_bytes")
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String?  @map("created_by")
+
+  creator User? @relation("MediaCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@map("media_assets")
+}
+
+// ─── Phase 3: Customers & Accounts ──────────────────────────────────────────
+
+model Customer {
+  id        String       @id @default(uuid())
+  name      String
+  phone     String?
+  email     String?
+  address   String?
+  type      CustomerType @default(NORMAL)
+  isActive  Boolean      @default(true) @map("is_active")
+  isDefaultPos Boolean   @default(false) @map("is_default_pos")
+  balance   Decimal      @default(0) @db.Decimal(12,2)
+
+  transactions CustomerTransaction[]
+  orders       Order[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String?  @map("created_by")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  updatedBy String?  @map("updated_by")
+
+  creator User? @relation("CustomerCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  updater User? @relation("CustomerUpdater", fields: [updatedBy], references: [id], onDelete: SetNull)
+
+  @@map("customers")
+}
+
+model CustomerTransaction {
+  id           String                  @id @default(uuid())
+  customerId   String                  @map("customer_id")
+  type         CustomerTransactionType
+  amount       Decimal                 @db.Decimal(12,2)
+  balanceAfter Decimal                 @db.Decimal(12,2) @map("balance_after")
+  referenceId  String?                 @map("reference_id")
+  orderId      String?                 @map("order_id")
+  sessionId    String?                 @map("session_id")
+  notes        String?
+  date         DateTime                @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  order    Order? @relation("OrderPayments", fields: [orderId], references: [id], onDelete: SetNull)
+  session  CashSession? @relation("SessionCustomerPayments", fields: [sessionId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String?  @map("created_by")
+
+  creator User? @relation("CustomerTransactionCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@map("customer_transactions")
+}
+
+// ─── Phase 4: Expenses & Accounting ────────────────────────────────────────
+
+model ExpenseCategory {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  nameAr      String?  @map("name_ar")
+  description String?
+  
+  expenses    Expense[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String?  @map("created_by")
+  
+  creator User? @relation("ExpenseCategoryCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@map("expense_categories")
+}
+
+model Expense {
+  id            String   @id @default(uuid())
+  categoryId    String?  @map("category_id")
+  amount        Decimal  @db.Decimal(12,2)
+  date          DateTime @default(now())
+  notes         String?
+  paymentMethod String?  @map("payment_method") @default("CASH")
+  reference     String?
+  sessionId     String?  @map("session_id")
+
+  category      ExpenseCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  session       CashSession? @relation("SessionExpenses", fields: [sessionId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String?  @map("created_by")
+  
+  creator User? @relation("ExpenseCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@map("expenses")
+}
+
+model SupplierTransaction {
+  id           String                  @id @default(uuid())
+  supplierId   String                  @map("supplier_id")
+  type         SupplierTransactionType
+  amount       Decimal                 @db.Decimal(12,2)
+  balanceAfter Decimal                 @db.Decimal(12,2) @map("balance_after")
+  referenceId  String?                 @map("reference_id")
+  sessionId    String?                 @map("session_id")
+  notes        String?
+  date         DateTime                @default(now())
+
+  supplier     Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  session      CashSession? @relation("SessionSupplierPayments", fields: [sessionId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  createdBy String?  @map("created_by")
+
+  creator User? @relation("SupplierTransactionCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@map("supplier_transactions")
+}
+
+model Order {
+  id               String          @id @default(uuid())
+  orderNumber      String          @unique @map("order_number")
+  customerId       String          @map("customer_id")
+  userId           String          @map("user_id")
+  
+  totalAmount      Decimal         @default(0) @db.Decimal(12, 2) @map("total_amount")
+  discount         Decimal         @default(0) @db.Decimal(12, 2)
+  taxAmount        Decimal         @default(0) @db.Decimal(12, 2) @map("tax_amount")
+  netAmount        Decimal         @default(0) @db.Decimal(12, 2) @map("net_amount")
+  
+  paidAmount       Decimal         @default(0) @db.Decimal(12, 2) @map("paid_amount")
+  balanceDue       Decimal         @default(0) @db.Decimal(12, 2) @map("balance_due")
+  
+  currency         String          @default("EGP")
+  exchangeRate     Decimal         @default(1.0) @db.Decimal(12, 4) @map("exchange_rate")
+  totalAmountBase  Decimal         @default(0) @db.Decimal(12, 2) @map("total_amount_base")
+  paidAmountBase   Decimal         @default(0) @db.Decimal(12, 2) @map("paid_amount_base")
+  
+  status           OrderStatus     @default(DRAFT)
+  stockDeducted    Boolean         @default(false) @map("stock_deducted")
+  paymentStatus    PaymentStatus   @default(UNPAID)
+  paymentMethod    String          @default("CASH") @map("payment_method")
+  
+  notes            String?
+  date             DateTime        @default(now())
+  
+  customer         Customer        @relation(fields: [customerId], references: [id])
+  creator          User            @relation("OrderCreator", fields: [userId], references: [id])
+  items            OrderItem[]
+  payments         CustomerTransaction[] @relation("OrderPayments")
+
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id               String          @id @default(uuid())
+  orderId          String          @map("order_id")
+  productId        String?         @map("product_id")
+  customName       String?         @map("custom_name")
+  quantity         Int
+  unitPrice        Decimal         @db.Decimal(12, 2) @map("unit_price")
+  totalPrice       Decimal         @db.Decimal(12, 2) @map("total_price")
+  
+  order            Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product          Product?        @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model CashSession {
+  id                    String            @id @default(uuid())
+  userId                String            @map("user_id")
+  openingDate           DateTime          @default(now()) @map("opening_date")
+  closingDate           DateTime?         @map("closing_date")
+  
+  openingBalance        Decimal           @default(0) @db.Decimal(12, 2) @map("opening_balance")
+  expectedBalance       Decimal           @default(0) @db.Decimal(12, 2) @map("expected_balance")
+  actualBalance         Decimal           @default(0) @db.Decimal(12, 2) @map("actual_balance")
+  difference            Decimal           @default(0) @db.Decimal(12, 2)
+  
+  totalSalesCash        Decimal           @default(0) @db.Decimal(12, 2) @map("total_sales_cash")
+  totalSalesCard        Decimal           @default(0) @db.Decimal(12, 2) @map("total_sales_card")
+  totalExpenses         Decimal           @default(0) @db.Decimal(12, 2) @map("total_expenses")
+  totalSupplierPayments Decimal           @default(0) @db.Decimal(12, 2) @map("total_supplier_payments")
+  totalCustomerPayments Decimal           @default(0) @db.Decimal(12, 2) @map("total_customer_payments")
+  
+  status                CashSessionStatus @default(OPEN)
+  notes                 String?
+
+  user                  User              @relation("SessionUser", fields: [userId], references: [id])
+  transactions          CustomerTransaction[] @relation("SessionCustomerPayments")
+  expenses              Expense[]         @relation("SessionExpenses")
+  supplierPayments      SupplierTransaction[] @relation("SessionSupplierPayments")
+
+  @@map("cash_sessions")
+}
+

@@ -1,0 +1,64 @@
+{
+  "title": "إعدادات المنصة",
+  "subtitle": "إدارة تفضيلات النظام، الضرائب، وبيانات المؤسسة",
+  "systemSettings": "إعدادات النظام",
+  "companyProfile": "الملف التعريفي للشركة",
+  "warehouses": "المخازن والمواقع",
+
+  "system": {
+    "inventoryTitle": "قواعد المخزون",
+    "allowNegativeStock": "السماح بالبيع بالسالب (نقص المخزون)",
+    "lowStockThreshold": "حد التنبيه الافتراضي للمخزون المنخفض",
+    "lowStockHelper": "سيتم تنبيهك عند وصول الكمية لهذا المستوى",
+    "pricingStrategy": "استراتيجية تسعير التكلفة",
+    "strategyAverage": "المتوسط الحسابي",
+    "strategyHighest": "أعلى سعر توريد",
+    "strategyLowest": "أدنى سعر توريد",
+    "fiscalTitle": "الضرائب والماليات",
+    "taxPercentage": "نسبة الضريبة الافتراضية",
+    "currency": "العملة الأساسية للمنصة",
+    "exchangeRate": "سعر الصرف (LBP/USD)",
+    "exchangeRateHelper": "سعر الصرف الافتراضي لليرة اللبنانية",
+    "enableWholesale": "تفعيل نظام البيع بالجملة",
+    "applyConfig": "حفظ إعدادات النظام",
+    "saved": "تم حفظ الإعدادات"
+  },
+
+  "company": {
+    "identityTitle": "الهوية المؤسسية",
+    "entityName": "اسم المنشأة",
+    "taxNumber": "الرقم الضريبي",
+    "contactTitle": "معلومات الاتصال",
+    "address": "العنوان الفعلي",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الهاتف",
+    "website": "الموقع الإلكتروني",
+    "invoicingTitle": "إعدادات الفواتير",
+    "invoiceHeader": "ترويسة الفاتورة",
+    "invoiceFooter": "خاتمة الفاتورة",
+    "posMessage": "رسالة الصندوق (POS)",
+    "brandingTitle": "تخصيص الواجهة",
+    "primaryColor": "اللون الأساسي",
+    "secondaryColor": "اللون الثانوي",
+    "updateProfile": "تحديث البيانات",
+    "saved": "تم حفظ بيانات الشركة"
+  },
+
+  "warehouse": {
+    "title": "إدارة المخازن والمواقع",
+    "addNew": "إضافة مخزن جديد",
+    "nodeName": "اسم الموقع",
+    "nodeType": "نوع الموقع",
+    "typeWarehouse": "مستودع",
+    "typeShowroom": "معرض",
+    "location": "العنوان / الموقع",
+    "addDialog": "إضافة موقع تخزين جديد",
+    "save": "حفظ البيانات",
+    "name": "الاسم",
+    "type": "النوع",
+    "locationCol": "الموقع",
+    "actions": "إجراءات",
+    "added": "تمت إضافة الموقع بنجاح",
+    "nameExists": "اسم المخزن موجود مسبقاً"
+  }
+}

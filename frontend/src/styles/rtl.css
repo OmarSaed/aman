@@ -1,0 +1,12 @@
+/* RTL overrides for Arabic layout */
+html[dir="rtl"] .sidebar   { inset-inline-start: 0; border-inline-end: 1px solid var(--sidebar-border); border-inline-start: none; }
+html[dir="rtl"] .main-content { margin-inline-start: var(--sidebar-width); margin-inline-end: 0; }
+html[dir="rtl"] .topbar    { inset-inline-start: var(--sidebar-width); inset-inline-end: 0; }
+html[dir="rtl"] .input-icon { inset-inline-start: 11px; inset-inline-end: auto; }
+html[dir="rtl"] .input-with-icon .input { padding-inline-start: 38px; padding-inline-end: 12px; }
+html[dir="rtl"] table thead th, html[dir="rtl"] table tbody td { text-align: right; }
+html[dir="rtl"] .toggle-thumb { inset-inline-start: 3px; }
+html[dir="rtl"] .toggle.on .toggle-thumb { inset-inline-start: 21px; }
+html[dir="rtl"] .modal-footer { justify-content: flex-start; }
+html[dir="rtl"] .pos-body { grid-template-columns: 340px 1fr; }
+html[dir="rtl"] .pos-cart { border-inline-start: none; border-inline-end: 1px solid rgba(255,255,255,0.08); }
