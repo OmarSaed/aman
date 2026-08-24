@@ -4,26 +4,31 @@ import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatMoney } from '../utils';
 import { ProductVisual } from './ProductTile';
-import { HERO_IMAGES } from '../heroImages';
+import { HERO_BG, HERO_IMAGES } from '../heroImages';
 
-function SlideVisual({ product, image, alt = '' }) {
+function SlideVisual({ product, image, alt = '', side = 'left', variant = '' }) {
   if (image) {
     return (
-      <div className="af-slide-visual">
-        <img src={image} alt={alt} className="af-slide-photo" loading="lazy" />
+      <div className={`af-slide-visual is-${side} is-${variant || 'photo'}`.trim()}>
+        <img
+          src={image}
+          alt={alt}
+          className={`af-slide-photo ${variant === 'cutout' ? 'is-cutout' : ''}`.trim()}
+          loading="lazy"
+        />
       </div>
     );
   }
 
   if (product) {
     return (
-      <div className="af-slide-visual">
+      <div className={`af-slide-visual is-${side}`.trim()}>
         <ProductVisual product={product} className="af-slide-product" />
       </div>
     );
   }
 
-  return <div className="af-slide-visual" aria-hidden />;
+  return <div className={`af-slide-visual is-${side}`} aria-hidden />;
 }
 
 export default function HeroSlider({ products = [], fromPrice, currency = 'USD' }) {
@@ -42,6 +47,7 @@ export default function HeroSlider({ products = [], fromPrice, currency = 'USD' 
       to: '/catalog',
       cta2: t('hero.ctaAlt'),
       to2: '/categories',
+      bg: HERO_BG,
       leftImage: HERO_IMAGES.left,
       rightImage: HERO_IMAGES.right,
     },
@@ -52,6 +58,7 @@ export default function HeroSlider({ products = [], fromPrice, currency = 'USD' 
       body: product.shortDescription || t('hero.productBody'),
       cta: t('hero.shopNow'),
       to: `/product/${product.id}`,
+      bg: HERO_BG,
       left: product,
       right: framed[(i + 1) % framed.length] || product,
     })),
@@ -92,11 +99,18 @@ export default function HeroSlider({ products = [], fromPrice, currency = 'USD' 
         onTouchEnd={onTouchEnd}
       >
         {slides.map((slide) => (
-          <article key={slide.id} className="af-slide">
+          <article
+            key={slide.id}
+            className="af-slide"
+            style={slide.bg ? { '--slide-bg': `url(${slide.bg})` } : undefined}
+          >
+            <div className="af-slide-bg" aria-hidden />
             <SlideVisual
               product={slide.left}
               image={slide.leftImage?.src}
               alt={slide.leftImage?.alt}
+              variant={slide.leftImage?.variant}
+              side="left"
             />
             <div className="af-slide-copy">
               <span className="af-pill">{slide.kicker}</span>
@@ -117,26 +131,35 @@ export default function HeroSlider({ products = [], fromPrice, currency = 'USD' 
               product={slide.right}
               image={slide.rightImage?.src}
               alt={slide.rightImage?.alt}
+              variant={slide.rightImage?.variant}
+              side="right"
             />
           </article>
         ))}
       </div>
-      <button type="button" className="af-slider-nav prev" onClick={() => go(-1)} aria-label="Previous">
-        <ChevronLeft size={18} />
-      </button>
-      <button type="button" className="af-slider-nav next" onClick={() => go(1)} aria-label="Next">
-        <ChevronRight size={18} />
-      </button>
-      <div className="af-slider-dots">
-        {slides.map((slide, i) => (
-          <button
-            key={slide.id}
-            type="button"
-            className={i === index ? 'is-on' : ''}
-            onClick={() => setIndex(i)}
-            aria-label={`Slide ${i + 1}`}
-          />
-        ))}
+
+      <div className="af-slider-ui">
+        <div className="af-slider-dots-shell">
+          <div className="af-slider-dots">
+            {slides.map((slide, i) => (
+              <button
+                key={slide.id}
+                type="button"
+                className={i === index ? 'is-on' : ''}
+                onClick={() => setIndex(i)}
+                aria-label={`Slide ${i + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+        <div className="af-slider-arrows">
+          <button type="button" className="af-slider-nav prev" onClick={() => go(-1)} aria-label="Previous">
+            <ChevronLeft size={18} strokeWidth={2.4} />
+          </button>
+          <button type="button" className="af-slider-nav next" onClick={() => go(1)} aria-label="Next">
+            <ChevronRight size={18} strokeWidth={2.4} />
+          </button>
+        </div>
       </div>
     </section>
   );

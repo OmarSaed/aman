@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 520" fill="none" role="img" aria-label="Smartphone">
+  <defs>
+    <linearGradient id="frame" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fdf2f8"/>
+      <stop offset="100%" stop-color="#fbcfe8"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#374151"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-10%" width="140%" height="130%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#111827" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)" transform="rotate(-8 210 260)">
+    <rect x="118" y="36" width="184" height="380" rx="34" fill="url(#frame)" stroke="#f9a8d4" stroke-width="3"/>
+    <rect x="132" y="68" width="156" height="312" rx="22" fill="url(#screen)"/>
+    <rect x="176" y="52" width="68" height="10" rx="5" fill="#111827" opacity="0.85"/>
+    <circle cx="210" cy="400" r="16" fill="#fff" opacity="0.18"/>
+    <rect x="150" y="110" width="120" height="8" rx="4" fill="#fff" opacity="0.12"/>
+    <rect x="150" y="136" width="88" height="8" rx="4" fill="#fff" opacity="0.08"/>
+  </g>
+</svg>
