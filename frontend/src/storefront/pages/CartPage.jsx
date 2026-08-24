@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ShoppingBag } from 'lucide-react';
 import { useCartStore } from '../cart.store';
 import { useStorefront } from '../StorefrontLayout';
 import { formatMoney } from '../utils';
@@ -17,6 +18,7 @@ export default function CartPage() {
     return (
       <div className="sf-page">
         <div className="sf-empty">
+          <div className="sf-empty-icon"><ShoppingBag size={32} /></div>
           <div className="sf-kicker">{t('cart.kicker')}</div>
           <h2>{t('cart.empty')}</h2>
           <Link className="sf-btn" to="/catalog">{t('cart.emptyCta')}</Link>
@@ -33,7 +35,7 @@ export default function CartPage() {
         <div>
           {items.map((item) => (
             <div className="sf-line" key={item.id}>
-              <ProductVisual product={item} />
+              <ProductVisual product={item} compact />
               <div>
                 <Link to={`/product/${item.id}`}><strong>{item.name}</strong></Link>
                 <div className="sf-price">{formatMoney(item.price, currency)}</div>
@@ -51,7 +53,7 @@ export default function CartPage() {
         </div>
         <aside className="sf-aside">
           <div className="sf-kicker">{t('cart.subtotal')}</div>
-          <h2 className="sf-price" style={{ fontSize: '2.4rem', fontFamily: 'var(--display)' }}>
+          <h2 className="sf-price" style={{ fontSize: '2rem', marginTop: '8px' }}>
             {formatMoney(subtotal, currency)}
           </h2>
           <div className="sf-actions" style={{ marginTop: '1.4rem' }}>

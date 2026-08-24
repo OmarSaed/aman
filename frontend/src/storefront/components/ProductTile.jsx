@@ -1,18 +1,31 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
+import { ShoppingBag } from 'lucide-react';
 import { formatMoney, mediaUrl } from '../utils';
 import { useCartStore } from '../cart.store';
+import ProductPlaceholder from './ProductPlaceholder';
 
-export function ProductVisual({ product, className = '', badge }) {
+export function ProductVisual({ product, className = '', badge, compact = false }) {
+  const { t } = useTranslation('storefront');
+  const [imgError, setImgError] = useState(false);
   const src = mediaUrl(product?.imageUrl);
+  const showImage = Boolean(src) && !imgError;
+  const badgeText = badge === 'new' ? t('home.newestBadge') : badge === 'sale' ? t('home.sale') : null;
+
   return (
-    <div className={`sf-visual ${className}`.trim()}>
-      {badge && <span className="um-badge">{badge}</span>}
-      {src ? (
-        <img src={src} alt={product?.name || ''} />
+    <div className={`sf-visual ${compact ? 'is-compact' : ''} ${className}`.trim()}>
+      {badgeText && <span className={`um-badge ${badge === 'new' ? 'is-new' : 'is-sale'}`}>{badgeText}</span>}
+      {showImage ? (
+        <img
+          src={src}
+          alt={product?.name || ''}
+          loading="lazy"
+          onError={() => setImgError(true)}
+        />
       ) : (
-        <div className="sf-visual-fallback">{(product?.name || 'A').slice(0, 1)}</div>
+        <ProductPlaceholder product={product} compact={compact} />
       )}
     </div>
   );
@@ -30,12 +43,11 @@ export default function ProductTile({ product, currency, badge }) {
     toast.success(t('product.added'));
   };
 
-  const label = badge === 'new' ? t('home.newestBadge') : t('home.sale');
-
   return (
     <article className="sf-tile">
-      <Link to={`/product/${product.id}`}>
-        <ProductVisual product={product} badge={label} />
+      <Link to={`/product/${product.id}`} className="sf-tile-media">
+        <ProductVisual product={product} badge={badge} />
+        <span className="sf-tile-quick">{t('hero.shopNow')}</span>
       </Link>
       <div className="sf-tile-meta">
         <small>
@@ -45,10 +57,13 @@ export default function ProductTile({ product, currency, badge }) {
         <Link to={`/product/${product.id}`}>
           <h3>{product.name}</h3>
         </Link>
-        <div className="sf-price">{formatMoney(product.price, currency)}</div>
-        <button type="button" className="um-add" onClick={add}>
-          {t('product.add')}
-        </button>
+        <div className="sf-tile-foot">
+          <div className="sf-price">{formatMoney(product.price, currency)}</div>
+          <button type="button" className="um-add" onClick={add} aria-label={t('product.add')}>
+            <ShoppingBag size={16} strokeWidth={2} />
+            <span>{t('product.add')}</span>
+          </button>
+        </div>
       </div>
     </article>
   );

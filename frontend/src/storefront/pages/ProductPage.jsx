@@ -61,21 +61,24 @@ export default function ProductPage() {
   return (
     <div className="sf-page">
       <Link to="/catalog" className="sf-kicker">{t('product.back')}</Link>
-      <div className="sf-product" style={{ marginTop: '1.6rem' }}>
+      <div className="sf-product" style={{ marginTop: '1.4rem' }}>
         <ProductVisual product={product} />
         <div className="sf-product-copy">
           <div className="sf-kicker">{product.category?.name || t('product.kicker')}</div>
           <h1 className="sf-page-title">{product.name}</h1>
-          <div className="sf-price" style={{ fontSize: '1.4rem' }}>{formatMoney(product.price, currency)}</div>
-          <p className="sf-lede">{product.longDescription || product.shortDescription}</p>
-          <div className="sf-status" style={{ marginTop: '1rem' }}>
-            {t('product.sku')} {product.sku}
+          <div className="sf-price" style={{ fontSize: '1.75rem' }}>{formatMoney(product.price, currency)}</div>
+          {(product.longDescription || product.shortDescription) && (
+            <p className="sf-lede">{product.longDescription || product.shortDescription}</p>
+          )}
+          <div className="sf-meta-bar" style={{ marginTop: '0.5rem' }}>
+            <span>{t('product.sku')}</span>
+            <strong>{product.sku}</strong>
           </div>
-          <div className={`sf-status ${product.inStock ? '' : 'late'}`} style={{ marginTop: '0.5rem' }}>
+          <div className={`sf-status ${product.inStock ? '' : 'late'}`}>
             <i />
             {product.inStock ? t('product.inStock') : t('product.madeToOrder')}
           </div>
-          {box > 1 && <p>{t('product.box', { count: box })}</p>}
+          {box > 1 && <p className="sf-lede">{t('product.box', { count: box })}</p>}
           {product.pricingTier === 'WHOLESALE' && <div className="sf-status">{t('account.wholesalePrice')}</div>}
           <div className="sf-qty">
             <button type="button" onClick={() => setQty((n) => snapQuantity(n - box, box))}>−</button>

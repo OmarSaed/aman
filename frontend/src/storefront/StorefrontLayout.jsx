@@ -208,33 +208,43 @@ export default function StorefrontLayout() {
 
         <footer className="um-footer">
           <div className="um-wrap um-footer-main">
-            <div className="um-footer-col">
+            <div className="um-footer-col um-footer-contact">
               <h4>{t('footer.contact')}</h4>
-              <div className="um-contact-pills">
-                <a className="um-contact-pill" href={`tel:${company?.phoneNumber || ''}`}>
-                  <span className="um-contact-icon"><Phone size={18} /></span>
-                  <span>
-                    <small>{t('footer.hours')}</small>
-                    <strong>{company?.phoneNumber || '+800 300-353'}</strong>
-                  </span>
-                </a>
-                <a className="um-contact-pill" href={`mailto:${company?.email || ''}`}>
-                  <span className="um-contact-icon"><Mail size={18} /></span>
-                  <span>
-                    <small>{t('footer.hours')}</small>
-                    <strong>{company?.email || 'info@afwholesale.com'}</strong>
-                  </span>
-                </a>
-                <div className="um-contact-pill">
-                  <span className="um-contact-icon"><MapPin size={18} /></span>
-                  <span>
-                    <small>{t('footer.hours')}</small>
-                    <strong>{company?.address || t('footer.findStores')}</strong>
-                  </span>
-                </div>
-              </div>
+              <p className="um-footer-blurb">{t('footer.contactHint')}</p>
+              <ul className="um-contact-list">
+                <li>
+                  <a className="um-contact-item" href={`tel:${company?.phoneNumber || '+800300353'}`}>
+                    <span className="um-contact-icon" aria-hidden><Phone size={18} /></span>
+                    <span className="um-contact-body">
+                      <span className="um-contact-label">{t('footer.phone')}</span>
+                      <span className="um-contact-value">{company?.phoneNumber || '+800 300-353'}</span>
+                      <span className="um-contact-meta">{t('footer.hours')}</span>
+                    </span>
+                  </a>
+                </li>
+                <li>
+                  <a className="um-contact-item" href={`mailto:${company?.email || 'info@afwholesale.com'}`}>
+                    <span className="um-contact-icon" aria-hidden><Mail size={18} /></span>
+                    <span className="um-contact-body">
+                      <span className="um-contact-label">{t('footer.email')}</span>
+                      <span className="um-contact-value">{company?.email || 'info@afwholesale.com'}</span>
+                      <span className="um-contact-meta">{t('footer.emailHint')}</span>
+                    </span>
+                  </a>
+                </li>
+                <li>
+                  <div className="um-contact-item is-static">
+                    <span className="um-contact-icon" aria-hidden><MapPin size={18} /></span>
+                    <span className="um-contact-body">
+                      <span className="um-contact-label">{t('footer.location')}</span>
+                      <span className="um-contact-value">{company?.address || t('footer.findStores')}</span>
+                      <span className="um-contact-meta">{t('footer.locationHint')}</span>
+                    </span>
+                  </div>
+                </li>
+              </ul>
             </div>
-            <div className="um-footer-col">
+            <div className="um-footer-col um-footer-links">
               <h4>{t('footer.help')}</h4>
               <Link to={accountTo}>{t('footer.accountInfo')}</Link>
               <Link to="/account">{t('footer.yourOrders')}</Link>
@@ -242,7 +252,7 @@ export default function StorefrontLayout() {
               <Link to="/login">{t('footer.staffLogin')}</Link>
               <Link to="/account/register">{t('hero.tradeCta')}</Link>
             </div>
-            <div className="um-footer-col">
+            <div className="um-footer-col um-footer-links">
               <h4>{t('footer.partner')}</h4>
               <Link to="/account/register">{t('footer.becomeVendor')}</Link>
               <Link to="/catalog">{t('footer.advertise')}</Link>

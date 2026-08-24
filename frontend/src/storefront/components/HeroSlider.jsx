@@ -2,31 +2,29 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { formatMoney, mediaUrl } from '../utils';
+import { formatMoney } from '../utils';
+import { ProductVisual } from './ProductTile';
 
-function SlideVisual({ src }) {
-  if (src) {
-    return (
-      <div className="af-slide-visual">
-        <img src={src} alt="" />
-      </div>
-    );
-  }
+function SlideVisual({ product }) {
   return (
     <div className="af-slide-visual">
-      <div className="af-slide-mark" aria-hidden>
-        <b>AF</b>
-        <span>Wholesale</span>
-      </div>
+      {product ? (
+        <ProductVisual product={product} className="af-slide-product" />
+      ) : (
+        <div className="af-slide-mark" aria-hidden>
+          <b>AF</b>
+          <span>Wholesale</span>
+        </div>
+      )}
     </div>
   );
 }
 
 export default function HeroSlider({ products = [], fromPrice, currency = 'USD' }) {
   const { t } = useTranslation('storefront');
-  const framed = products.filter((p) => p.imageUrl).slice(0, 6);
-  const leftImg = framed[0] ? mediaUrl(framed[0].imageUrl) : null;
-  const rightImg = framed[1] ? mediaUrl(framed[1].imageUrl) : leftImg;
+  const framed = products.slice(0, 6);
+  const leftProduct = framed[0] || null;
+  const rightProduct = framed[1] || framed[0] || null;
   const priceLabel = fromPrice != null ? formatMoney(fromPrice, currency) : '';
 
   const slides = [
@@ -40,8 +38,8 @@ export default function HeroSlider({ products = [], fromPrice, currency = 'USD' 
       to: '/catalog',
       cta2: t('hero.ctaAlt'),
       to2: '/categories',
-      left: leftImg,
-      right: rightImg,
+      left: leftProduct,
+      right: rightProduct,
     },
     ...framed.slice(0, 3).map((product, i) => ({
       id: product.id,
@@ -50,10 +48,8 @@ export default function HeroSlider({ products = [], fromPrice, currency = 'USD' 
       body: product.shortDescription || t('hero.productBody'),
       cta: t('hero.shopNow'),
       to: `/product/${product.id}`,
-      left: mediaUrl(product.imageUrl),
-      right: framed[(i + 1) % framed.length]
-        ? mediaUrl(framed[(i + 1) % framed.length].imageUrl)
-        : mediaUrl(product.imageUrl),
+      left: product,
+      right: framed[(i + 1) % framed.length] || product,
     })),
   ];
 
@@ -93,7 +89,7 @@ export default function HeroSlider({ products = [], fromPrice, currency = 'USD' 
       >
         {slides.map((slide) => (
           <article key={slide.id} className="af-slide">
-            <SlideVisual src={slide.left} />
+            <SlideVisual product={slide.left} />
             <div className="af-slide-copy">
               <span className="af-pill">{slide.kicker}</span>
               <h2>{slide.title}</h2>
@@ -109,7 +105,7 @@ export default function HeroSlider({ products = [], fromPrice, currency = 'USD' 
                 {slide.to2 && <Link className="af-btn ghost" to={slide.to2}>{slide.cta2}</Link>}
               </div>
             </div>
-            <SlideVisual src={slide.right} />
+            <SlideVisual product={slide.right} />
           </article>
         ))}
       </div>
