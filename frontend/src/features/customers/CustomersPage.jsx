@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { Plus, Search, MoreVertical, Pencil, User, Trash2, Wallet, Eye } from 'lucide-react';
+import { Plus, Search, Pencil, User, Trash2, Wallet, Check, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { customersService } from '../../services/customers.service';
@@ -20,13 +20,14 @@ export default function CustomersPage() {
   const [limit, setLimit] = useState(10);
   const [search, setSearch] = useState('');
   const [type, setType] = useState('');
+  const [accountStatus, setAccountStatus] = useState('');
   const [formOpen, setFormOpen] = useState(false);
   const [editCustomer, setEditCustomer] = useState(null);
   const [openMenu, setOpenMenu] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState(null);
 
-  const params = { page, limit, search, type };
+  const params = { page, limit, search, type, accountStatus: accountStatus || undefined };
 
   const { data, isLoading } = useQuery({
     queryKey: ['customers', params],
@@ -40,6 +41,17 @@ export default function CustomersPage() {
       qc.invalidateQueries(['customers']);
     },
     onError: (e) => toast.error(e.response?.data?.message || (isAr ? 'خطأ أثناء الحذف' : 'Error deleting'))
+  });
+
+  const mutReview = useMutation({
+    mutationFn: ({ id, action }) => customersService.reviewWholesale(id, action),
+    onSuccess: (_res, vars) => {
+      toast.success(vars.action === 'approve'
+        ? (isAr ? 'تم اعتماد حساب الجملة' : 'Wholesale account approved')
+        : (isAr ? 'تم رفض طلب الجملة' : 'Wholesale request rejected'));
+      qc.invalidateQueries(['customers']);
+    },
+    onError: (e) => toast.error(e.response?.data?.message || (isAr ? 'فشل الإجراء' : 'Action failed')),
   });
 
   const handleDelete = (id) => {
@@ -94,6 +106,17 @@ export default function CustomersPage() {
             <option value="NORMAL">{isAr ? 'عادي' : 'Normal'}</option>
             <option value="WHOLESALE">{isAr ? 'جملة' : 'Wholesale'}</option>
           </select>
+          <select
+            className="select"
+            style={{ width: 180 }}
+            value={accountStatus}
+            onChange={e => { setAccountStatus(e.target.value); setPage(1); }}
+          >
+            <option value="">{isAr ? 'كل الحسابات' : 'All accounts'}</option>
+            <option value="PENDING">{isAr ? 'جملة بانتظار الموافقة' : 'Pending wholesale'}</option>
+            <option value="APPROVED">{isAr ? 'حساب موقع معتمد' : 'Portal approved'}</option>
+            <option value="REJECTED">{isAr ? 'مرفوض' : 'Rejected'}</option>
+          </select>
         </div>
 
         <div className="table-wrapper">
@@ -132,6 +155,16 @@ export default function CustomersPage() {
                     <span className={`badge badge-${c.type === 'WHOLESALE' ? 'primary' : 'secondary'}`}>
                       {c.type === 'WHOLESALE' ? (isAr ? 'جملة' : 'Wholesale') : (isAr ? 'عادي' : 'Normal')}
                     </span>
+                    {c.accountStatus === 'PENDING' && (
+                      <span className="badge badge-warning" style={{ marginInlineStart: 6 }}>
+                        {isAr ? 'بانتظار الموافقة' : 'Pending approval'}
+                      </span>
+                    )}
+                    {c.accountStatus === 'REJECTED' && (
+                      <span className="badge badge-error" style={{ marginInlineStart: 6 }}>
+                        {isAr ? 'مرفوض' : 'Rejected'}
+                      </span>
+                    )}
                   </td>
                   <td style={{ fontWeight: 700, color: c.balance >= 0 ? 'var(--success)' : 'var(--error)' }}>
                     {parseFloat(c.balance).toLocaleString()} $
@@ -151,6 +184,24 @@ export default function CustomersPage() {
                         <Wallet size={15} className="text-primary-500" />
                       </button>
                       <Can permission="customers:update">
+                        {c.accountStatus === 'PENDING' && (
+                          <>
+                            <button
+                              className="btn btn-ghost btn-icon"
+                              title={isAr ? 'اعتماد الجملة' : 'Approve wholesale'}
+                              onClick={() => mutReview.mutate({ id: c.id, action: 'approve' })}
+                            >
+                              <Check size={15} className="text-success" />
+                            </button>
+                            <button
+                              className="btn btn-ghost btn-icon"
+                              title={isAr ? 'رفض الجملة' : 'Reject wholesale'}
+                              onClick={() => mutReview.mutate({ id: c.id, action: 'reject' })}
+                            >
+                              <X size={15} className="text-error" />
+                            </button>
+                          </>
+                        )}
                         <button 
                           className="btn btn-ghost btn-icon" 
                           title={isAr ? 'تعديل' : 'Edit'}

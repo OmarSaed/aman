@@ -49,6 +49,21 @@ export const productsService = {
   // Barcodes
   generateMissingBarcodes: () => api.post('/products/barcodes/generate-missing'),
 
+  legacyStatus: () => api.get('/legacy/status'),
+  legacyUpload: (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/legacy/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 180000,
+    });
+  },
+  legacyUseProjectBackup: () => api.post('/legacy/use-project-backup'),
+  legacyRestore: () => api.post('/legacy/restore', {}, { timeout: 180000 }),
+  legacyCategories: () => api.get('/legacy/categories'),
+  legacyPreview: (params) => api.get('/legacy/preview', { params, timeout: 120000 }),
+  legacySync: (data) => api.post('/legacy/sync', data, { timeout: 180000 }),
+
   // Stock
   getTransactions: (productId) => api.get(`/products/${productId}/transactions`),
 };

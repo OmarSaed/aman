@@ -17,6 +17,10 @@ const authenticate = async (req, res, next) => {
       return unauthorized(res, 'Invalid token payload');
     }
 
+    if (decoded.kind === 'customer') {
+      return unauthorized(res, 'Staff token required');
+    }
+
     // Attach full user context to request
     req.user = {
       id:          decoded.sub,

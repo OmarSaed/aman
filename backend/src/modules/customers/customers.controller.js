@@ -5,22 +5,32 @@ const { logAction } = require('../../utils/audit');
 const { paginate } = require('../../utils/paginate');
 const prisma = new PrismaClient();
 
+const sanitizeCustomer = (customer) => {
+  if (!customer) return customer;
+  const { passwordHash, ...safe } = customer;
+  return safe;
+};
+
 // ─── Customers ──────────────────────────────────────────────────────────────
 
 exports.listCustomers = async (req, res, next) => {
   try {
-    const { page, limit, search, type } = req.query;
+    const { page, limit, search, type, accountStatus } = req.query;
     const filters = {};
     
     if (search) {
       filters.OR = [
         { name: { contains: search, mode: 'insensitive' } },
         { phone: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
       ];
     }
     
     if (type) {
       filters.type = type;
+    }
+    if (accountStatus) {
+      filters.accountStatus = accountStatus;
     }
 
     const query = {
@@ -30,11 +40,14 @@ exports.listCustomers = async (req, res, next) => {
 
     if (page && limit) {
       const result = await paginate(prisma.customer, query, page, limit);
-      return res.status(200).json(result);
+      return res.status(200).json({
+        ...result,
+        data: (result.data || []).map(sanitizeCustomer),
+      });
     }
 
     const customers = await prisma.customer.findMany(query);
-    return successResponse(res, customers);
+    return successResponse(res, customers.map(sanitizeCustomer));
   } catch (error) { next(error); }
 };
 
@@ -62,7 +75,7 @@ exports.createCustomer = async (req, res, next) => {
     });
     
     await logAction(req.user.id, 'CREATE', 'customers', customer.id, 'Customer', null, customer, req);
-    return successResponse(res, customer, 'Customer created', 201);
+    return successResponse(res, sanitizeCustomer(customer), 'Customer created', 201);
   } catch (error) { next(error); }
 };
 
@@ -91,12 +104,16 @@ exports.updateCustomer = async (req, res, next) => {
         type, 
         isActive,
         isDefaultPos: isDefaultPos !== undefined ? !!isDefaultPos : old.isDefaultPos,
+        requestedType: type === 'WHOLESALE' ? 'WHOLESALE' : old.requestedType,
+        accountStatus: type === 'WHOLESALE' && old.accountStatus !== 'NONE'
+          ? 'APPROVED'
+          : old.accountStatus,
         updatedBy: req.user.id 
       }
     });
 
     await logAction(req.user.id, 'UPDATE', 'customers', updated.id, 'Customer', old, updated, req);
-    return successResponse(res, updated, 'Customer updated');
+    return successResponse(res, sanitizeCustomer(updated), 'Customer updated');
   } catch (error) { next(error); }
 };
 
@@ -146,11 +163,11 @@ exports.getCustomerAccount = async (req, res, next) => {
 
     if (page && limit) {
       const result = await paginate(prisma.customerTransaction, query, page, limit);
-      return res.status(200).json({ customer, ...result });
+      return res.status(200).json({ customer: sanitizeCustomer(customer), ...result });
     }
 
     const transactions = await prisma.customerTransaction.findMany(query);
-    return successResponse(res, { customer, transactions });
+    return successResponse(res, { customer: sanitizeCustomer(customer), transactions });
   } catch (error) { next(error); }
 };
 
@@ -298,4 +315,27 @@ exports.resetCustomer = async (req, res, next) => {
     if (error.message === 'Customer not found') return res.status(404).json({ success: false, message: error.message });
     next(error);
   }
+};
+
+exports.reviewWholesale = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const action = String(req.body?.action || '').toLowerCase();
+    if (!['approve', 'reject'].includes(action)) {
+      return res.status(400).json({ success: false, message: 'Action must be approve or reject' });
+    }
+
+    const old = await prisma.customer.findUnique({ where: { id } });
+    if (!old) return res.status(404).json({ success: false, message: 'Customer not found' });
+
+    const updated = await prisma.customer.update({
+      where: { id },
+      data: action === 'approve'
+        ? { type: 'WHOLESALE', requestedType: 'WHOLESALE', accountStatus: 'APPROVED', updatedBy: req.user.id }
+        : { type: 'NORMAL', accountStatus: 'REJECTED', updatedBy: req.user.id },
+    });
+
+    await logAction(req.user.id, 'UPDATE', 'customers', id, 'Customer', old, updated, req);
+    return successResponse(res, sanitizeCustomer(updated), action === 'approve' ? 'Wholesale account approved' : 'Wholesale request rejected');
+  } catch (error) { next(error); }
 };

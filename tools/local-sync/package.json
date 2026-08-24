@@ -1,0 +1,14 @@
+{
+  "name": "aman-local-sync",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Read local SQL Server POS and push products to Aman VPS",
+  "main": "sync.js",
+  "scripts": {
+    "sync": "node sync.js",
+    "categories": "node sync.js --list-categories"
+  },
+  "dependencies": {
+    "mssql": "^12.7.0"
+  }
+}

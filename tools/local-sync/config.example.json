@@ -1,0 +1,20 @@
+{
+  "vps": {
+    "apiUrl": "https://YOUR-VPS-DOMAIN/api",
+    "syncKey": "PASTE_SAME_KEY_AS_SYNC_API_KEY_ON_VPS"
+  },
+  "warehouseId": "PASTE-WAREHOUSE-UUID-FROM-AMAN-ERP",
+  "category": "",
+  "updatePrices": true,
+  "updateStock": true,
+  "createMissing": false,
+  "batchSize": 500,
+  "sqlServer": {
+    "server": "localhost",
+    "port": 1433,
+    "user": "sa",
+    "password": "YOUR_SQL_PASSWORD",
+    "database": "LegacyPOS",
+    "encrypt": false
+  }
+}

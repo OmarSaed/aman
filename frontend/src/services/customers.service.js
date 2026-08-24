@@ -10,4 +10,5 @@ export const customersService = {
   getAccount: (id, params) => api.get(`/customers/${id}/account`, { params }),
   addPayment: (data) => api.post('/customers/payments', data),
   resetAccount: (id, data) => api.post(`/customers/${id}/reset`, data),
+  reviewWholesale: (id, action) => api.patch(`/customers/${id}/wholesale-review`, { action }),
 };

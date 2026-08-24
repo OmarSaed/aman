@@ -20,6 +20,9 @@ const accountingRoutes = require('./src/modules/accounting/accounting.routes');
 const orderRoutes      = require('./src/modules/orders/orders.routes');
 const dayboxRoutes     = require('./src/modules/daybox/daybox.routes');
 const reportsRoutes    = require('./src/modules/reports/reports.routes');
+const publicRoutes     = require('./src/modules/public/public.routes');
+const legacyRoutes     = require('./src/modules/legacy/legacy.routes');
+const syncRoutes       = require('./src/modules/sync/sync.routes');
 const path             = require('path');
 
 const app  = express();
@@ -58,6 +61,9 @@ app.use('/api/accounting', accountingRoutes);
 app.use('/api/orders',     orderRoutes);
 app.use('/api/daybox',     dayboxRoutes);
 app.use('/api/reports',    reportsRoutes);
+app.use('/api/public',     publicRoutes);
+app.use('/api/legacy',     legacyRoutes);
+app.use('/api/sync',       syncRoutes);
 
 // ── 404 ───────────────────────────────────────────────────────────────────────
 app.use((_req, res) => res.status(404).json({ success: false, message: 'Route not found' }));

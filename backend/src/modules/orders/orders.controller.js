@@ -18,7 +18,8 @@ exports.createOrder = async (req, res, next) => {
       initialPayment = 0,
       paymentMethod = 'CASH',
       notes,
-      stockDeducted = false
+      stockDeducted = false,
+      source = 'SALES'
     } = req.body;
 
     if (status === 'DRAFT') {
@@ -99,6 +100,7 @@ exports.createOrder = async (req, res, next) => {
 
       // 3. Generate Order Number (Simple logic: ORD-timestamp)
       const orderNumber = `ORD-${Date.now()}`;
+      const orderSource = ['POS', 'SALES'].includes(source) ? source : 'SALES';
 
       const isStockDeductionRequired = status === 'CONFIRMED' || status === 'COMPLETED' || (status === 'DRAFT' && stockDeducted === true);
 
@@ -108,6 +110,7 @@ exports.createOrder = async (req, res, next) => {
           orderNumber,
           customerId,
           userId: req.user.id,
+          source: orderSource,
           totalAmount,
           discount,
           taxAmount,
@@ -239,10 +242,11 @@ exports.createOrder = async (req, res, next) => {
 
 exports.listOrders = async (req, res, next) => {
   try {
-    const { page, limit, status, customerId, search } = req.query;
+    const { page, limit, status, customerId, search, source } = req.query;
     const filters = {};
     if (status) filters.status = status;
     if (customerId) filters.customerId = customerId;
+    if (source) filters.source = source;
     if (search) {
       filters.OR = [
         { orderNumber: { contains: search, mode: 'insensitive' } },
@@ -266,7 +270,7 @@ exports.listOrders = async (req, res, next) => {
     const query = {
       where: filters,
       include: {
-        customer: { select: { name: true, phone: true } },
+        customer: { select: { id: true, name: true, phone: true, type: true, email: true, address: true } },
         creator: { select: { name: true } },
         items: {
           include: {
@@ -312,8 +316,8 @@ exports.updateOrderStatus = async (req, res, next) => {
     });
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
 
-    // logic for changing status (especially DRAFT -> CONFIRMED)
-    if (order.status === 'DRAFT' && (status === 'CONFIRMED' || status === 'COMPLETED')) {
+    // Confirm drafts and website (PENDING) orders: deduct stock and post customer balance
+    if (['DRAFT', 'PENDING'].includes(order.status) && (status === 'CONFIRMED' || status === 'COMPLETED')) {
       const updatedOrder = await prisma.$transaction(async (tx) => {
         // Deduct stock, log transactions, etc. only if stock was not already deducted!
         if (!order.stockDeducted) {

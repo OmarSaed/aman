@@ -144,6 +144,18 @@ model RefreshToken {
   @@map("refresh_tokens")
 }
 
+model CustomerRefreshToken {
+  id         String   @id @default(uuid())
+  customerId String   @map("customer_id")
+  token      String   @unique
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@map("customer_refresh_tokens")
+}
+
 // ─── Audit ──────────────────────────────────────────────────────────────────
 
 model AuditLog {
@@ -204,6 +216,13 @@ enum CustomerType {
   WHOLESALE
 }
 
+enum CustomerAccountStatus {
+  NONE
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum CustomerTransactionType {
   PAYMENT
   SALE
@@ -231,6 +250,12 @@ enum PaymentStatus {
   PARTIAL
   PAID
   ON_ACCOUNT
+}
+
+enum OrderSource {
+  POS
+  SALES
+  WEBSITE
 }
 
 enum CashSessionStatus {
@@ -540,13 +565,18 @@ model Customer {
   phone     String?
   email     String?
   address   String?
+  companyName String?    @map("company_name")
   type      CustomerType @default(NORMAL)
+  requestedType CustomerType @default(NORMAL) @map("requested_type")
+  accountStatus CustomerAccountStatus @default(NONE) @map("account_status")
+  passwordHash  String?  @map("password_hash")
   isActive  Boolean      @default(true) @map("is_active")
   isDefaultPos Boolean   @default(false) @map("is_default_pos")
   balance   Decimal      @default(0) @db.Decimal(12,2)
 
   transactions CustomerTransaction[]
   orders       Order[]
+  refreshTokens CustomerRefreshToken[]
 
   createdAt DateTime @default(now()) @map("created_at")
   createdBy String?  @map("created_by")
@@ -648,7 +678,8 @@ model Order {
   id               String          @id @default(uuid())
   orderNumber      String          @unique @map("order_number")
   customerId       String          @map("customer_id")
-  userId           String          @map("user_id")
+  userId           String?         @map("user_id")
+  source           OrderSource     @default(SALES)
   
   totalAmount      Decimal         @default(0) @db.Decimal(12, 2) @map("total_amount")
   discount         Decimal         @default(0) @db.Decimal(12, 2)
@@ -672,7 +703,7 @@ model Order {
   date             DateTime        @default(now())
   
   customer         Customer        @relation(fields: [customerId], references: [id])
-  creator          User            @relation("OrderCreator", fields: [userId], references: [id])
+  creator          User?           @relation("OrderCreator", fields: [userId], references: [id], onDelete: SetNull)
   items            OrderItem[]
   payments         CustomerTransaction[] @relation("OrderPayments")
 

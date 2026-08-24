@@ -180,7 +180,8 @@ export default function POSScreen() {
         initialPayment: total,
         currency,
         exchangeRate,
-        notes: 'POS Order'
+        notes: 'POS Order',
+        source: 'POS',
       });
       
       const createdOrder = res.data?.data || res.data;

@@ -304,7 +304,8 @@ export default function SalesOrderFormPage() {
       paymentStatus: paymentMethod === 'ON_ACCOUNT' ? 'ON_ACCOUNT' : (amountPaid >= netAmount ? 'PAID' : (amountPaid > 0 ? 'PARTIAL' : 'UNPAID')),
       initialPayment: parseFloat(amountPaid) || 0,
       amountPaid: parseFloat(amountPaid) || 0,
-      notes
+      notes,
+      source: 'SALES',
     };
 
     try {

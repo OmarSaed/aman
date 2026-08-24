@@ -30,6 +30,18 @@ import DayboxPage         from './features/cashier/DayboxPage';
 import ReportsPage        from './features/reports/ReportsPage';
 import LowStockReport     from './features/reports/LowStockReport';
 import useAuthStore       from './store/auth.store';
+import StorefrontLayout   from './storefront/StorefrontLayout';
+import HomePage           from './storefront/pages/HomePage';
+import CatalogPage        from './storefront/pages/CatalogPage';
+import CategoriesPage     from './storefront/pages/CategoriesPage';
+import CategoryPage       from './storefront/pages/CategoryPage';
+import ProductPage        from './storefront/pages/ProductPage';
+import CartPage           from './storefront/pages/CartPage';
+import CheckoutPage       from './storefront/pages/CheckoutPage';
+import OrderReceivedPage  from './storefront/pages/OrderReceivedPage';
+import AccountLoginPage   from './storefront/pages/AccountLoginPage';
+import AccountRegisterPage from './storefront/pages/AccountRegisterPage';
+import AccountPage        from './storefront/pages/AccountPage';
 
 const DashboardRouter = () => {
   const { user } = useAuthStore();
@@ -44,6 +56,19 @@ export default function App() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
     <Routes>
+      <Route element={<StorefrontLayout />}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/catalog" element={<CatalogPage />} />
+        <Route path="/categories" element={<CategoriesPage />} />
+        <Route path="/categories/:id" element={<CategoryPage />} />
+        <Route path="/product/:id" element={<ProductPage />} />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/order-received" element={<OrderReceivedPage />} />
+        <Route path="/account/login" element={<AccountLoginPage />} />
+        <Route path="/account/register" element={<AccountRegisterPage />} />
+        <Route path="/account" element={<AccountPage />} />
+      </Route>
       <Route path="/login" element={<LoginPage />} />
       <Route element={<ProtectedRoute />}>
         <Route element={<RoleRouter />}>
@@ -76,7 +101,6 @@ export default function App() {
           <Route path="*"          element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Route>
-      <Route path="/"    element={<Navigate to="/dashboard" replace />} />
     </Routes>
     </Suspense>
   );

@@ -113,6 +113,7 @@ export default function SalesOrderViewPage() {
   const getStatusColor = (status) => {
     switch (status) {
       case 'DRAFT': return 'warning';
+      case 'PENDING': return 'info';
       case 'CONFIRMED': return 'success';
       case 'CANCELLED': return 'error';
       case 'COMPLETED': return 'info';
@@ -236,8 +237,14 @@ export default function SalesOrderViewPage() {
             <ChevronLeft size={24} />
           </IconButton>
           <Box>
-            <Typography variant="h4" sx={{ fontWeight: 800 }}>
+            <Typography variant="h4" sx={{ fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1.5 }}>
               {isAr ? `طلب #${order.orderNumber}` : `Order #${order.orderNumber}`}
+              {order.source === 'WEBSITE' && (
+                <Chip size="small" color="secondary" label={isAr ? 'طلب موقع' : 'Website order'} />
+              )}
+              {order.source === 'POS' && (
+                <Chip size="small" color="info" label="POS" />
+              )}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               {formatDate(order.createdAt, 'PPpp')}
@@ -268,7 +275,7 @@ export default function SalesOrderViewPage() {
           >
             {isAr ? 'حراري' : 'Thermal'}
           </Button>
-          {order.status === 'DRAFT' && (
+          {['DRAFT', 'PENDING'].includes(order.status) && (
             <Button 
               variant="contained" 
               color="success"

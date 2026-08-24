@@ -23,6 +23,8 @@ router.post('/payments', requirePermission('customers:update'), customersControl
 // Update customer info
 router.put('/:id', requirePermission('customers:update'), customersController.updateCustomer);
 
+router.patch('/:id/wholesale-review', requirePermission('customers:update'), customersController.reviewWholesale);
+
 // Reset customer balance/history
 router.post('/:id/reset', requirePermission('customers:update'), customersController.resetCustomer);
 

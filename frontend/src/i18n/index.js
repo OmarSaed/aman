@@ -9,14 +9,16 @@ import enProducts from './locales/en/products.json';
 import arProducts from './locales/ar/products.json';
 import enSettings from './locales/en/settings.json';
 import arSettings from './locales/ar/settings.json';
+import enStorefront from './locales/en/storefront.json';
+import arStorefront from './locales/ar/storefront.json';
 
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources: {
-      en: { common: enCommon, products: enProducts, settings: enSettings },
-      ar: { common: arCommon, products: arProducts, settings: arSettings },
+      en: { common: enCommon, products: enProducts, settings: enSettings, storefront: enStorefront },
+      ar: { common: arCommon, products: arProducts, settings: arSettings, storefront: arStorefront },
     },
     defaultNS: 'common',
     fallbackLng: 'en',

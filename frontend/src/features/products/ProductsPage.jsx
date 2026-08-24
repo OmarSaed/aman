@@ -2,12 +2,13 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Tabs, Tab, Paper, Typography, Container } from '@mui/material';
-import { Inventory, AccountTree, BrandingWatermark, QrCode } from '@mui/icons-material';
+import { Inventory, AccountTree, BrandingWatermark, QrCode, CloudSync } from '@mui/icons-material';
 import ProductsList from './ProductsList';
 import CategoriesList from './CategoriesList';
 import BrandsList from './BrandsList';
 import BarcodesList from './BarcodesList';
 import MinStockList from './MinStockList';
+import LegacySyncPanel from './LegacySyncPanel';
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -94,6 +95,13 @@ export default function ProductsPage() {
               {...a11yProps(4)} 
               sx={{ fontWeight: 700 }}
             />
+            <Tab
+              icon={<CloudSync sx={{ fontSize: 18 }} />}
+              iconPosition="start"
+              label={isAr ? 'مزامنة النسخة القديمة' : 'Legacy POS sync'}
+              {...a11yProps(5)}
+              sx={{ fontWeight: 700 }}
+            />
           </Tabs>
         </Box>
 
@@ -118,6 +126,11 @@ export default function ProductsPage() {
         <CustomTabPanel value={value} index={4}>
           <Box sx={{ maxWidth: '100%' }}>
             <MinStockList />
+          </Box>
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={5}>
+          <Box sx={{ maxWidth: '100%' }}>
+            <LegacySyncPanel />
           </Box>
         </CustomTabPanel>
       </Box>

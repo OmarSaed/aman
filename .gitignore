@@ -5,3 +5,8 @@ dist/
 build/
 .DS_Store
 Thumbs.db
+backend/uploads/legacy/*.bak
+backup.bak
+tools/local-sync/config.json
+tools/local-sync/node_modules/
+tools/local-sync/logs/

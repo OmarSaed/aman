@@ -24,6 +24,7 @@ export default function SalesOrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [sourceFilter, setSourceFilter] = useState('ALL');
   const [search, setSearch] = useState('');
   
   // Pagination
@@ -41,6 +42,7 @@ export default function SalesOrdersPage() {
   // Column Visibility State
   const DEFAULT_COLUMNS = {
     orderNumber: true,
+    source: true,
     date: true,
     customer: true,
     notes: true,
@@ -56,7 +58,7 @@ export default function SalesOrdersPage() {
 
   const [visibleColumns, setVisibleColumns] = useState(() => {
     const saved = localStorage.getItem('salesOrdersColumns');
-    return saved ? JSON.parse(saved) : DEFAULT_COLUMNS;
+    return saved ? { ...DEFAULT_COLUMNS, ...JSON.parse(saved) } : DEFAULT_COLUMNS;
   });
 
   useEffect(() => {
@@ -82,7 +84,7 @@ export default function SalesOrdersPage() {
 
   useEffect(() => {
     fetchOrders();
-  }, [statusFilter, page, rowsPerPage]);
+  }, [statusFilter, sourceFilter, page, rowsPerPage]);
 
   const fetchOrders = async () => {
     setLoading(true);
@@ -91,6 +93,7 @@ export default function SalesOrdersPage() {
         page: page + 1,
         limit: rowsPerPage,
         status: statusFilter === 'ALL' ? undefined : statusFilter,
+        source: sourceFilter === 'ALL' ? undefined : sourceFilter,
         search 
       });
       if (res.data.pagination) {
@@ -183,6 +186,7 @@ export default function SalesOrdersPage() {
   const getStatusColor = (status) => {
     switch (status) {
       case 'DRAFT': return 'warning';
+      case 'PENDING': return 'info';
       case 'CONFIRMED': return 'success';
       case 'CANCELLED': return 'error';
       case 'COMPLETED': return 'info';
@@ -252,7 +256,7 @@ export default function SalesOrdersPage() {
       <Card sx={{ mb: 4, borderRadius: 3, boxShadow: 'var(--shadow-sm)' }}>
         <CardContent sx={{ p: 3 }}>
           <Grid container spacing={2} alignItems="center">
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <TextField
                 fullWidth
                 placeholder={isAr ? 'بحث برقم الطلب، العميل، أو الملاحظات...' : 'Search by order #, customer, or notes...'}
@@ -269,19 +273,35 @@ export default function SalesOrdersPage() {
                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
               />
             </Grid>
-            <Grid size={{ xs: 12, md: 3 }}>
+            <Grid size={{ xs: 12, md: 2 }}>
               <TextField
                 select
                 fullWidth
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                onChange={(e) => { setStatusFilter(e.target.value); setPage(0); }}
                 label={isAr ? 'الحالة' : 'Status'}
                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
               >
                 <MenuItem value="ALL">{isAr ? 'الكل' : 'All'}</MenuItem>
+                <MenuItem value="PENDING">{isAr ? 'قيد الانتظار (موقع)' : 'Pending (Website)'}</MenuItem>
                 <MenuItem value="DRAFT">{isAr ? 'مسودة' : 'Draft'}</MenuItem>
                 <MenuItem value="CONFIRMED">{isAr ? 'مؤكد' : 'Confirmed'}</MenuItem>
                 <MenuItem value="CANCELLED">{isAr ? 'ملغي' : 'Cancelled'}</MenuItem>
+              </TextField>
+            </Grid>
+            <Grid size={{ xs: 12, md: 3 }}>
+              <TextField
+                select
+                fullWidth
+                value={sourceFilter}
+                onChange={(e) => { setSourceFilter(e.target.value); setPage(0); }}
+                label={isAr ? 'المصدر' : 'Source'}
+                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
+              >
+                <MenuItem value="ALL">{isAr ? 'الكل' : 'All'}</MenuItem>
+                <MenuItem value="WEBSITE">{isAr ? 'الموقع' : 'Website'}</MenuItem>
+                <MenuItem value="POS">POS</MenuItem>
+                <MenuItem value="SALES">{isAr ? 'مبيعات' : 'Sales'}</MenuItem>
               </TextField>
             </Grid>
             <Grid size={{ xs: 12, md: 3 }}>
@@ -303,6 +323,7 @@ export default function SalesOrdersPage() {
           <TableHead sx={{ bgcolor: 'background.neutral' }}>
             <TableRow>
               {visibleColumns.orderNumber && <TableCell>{isAr ? 'رقم الطلب' : 'Order #'}</TableCell>}
+              {visibleColumns.source && <TableCell>{isAr ? 'المصدر' : 'Source'}</TableCell>}
               {visibleColumns.date && <TableCell>{isAr ? 'التاريخ' : 'Date'}</TableCell>}
               {visibleColumns.customer && <TableCell>{isAr ? 'العميل' : 'Customer'}</TableCell>}
               {visibleColumns.notes && <TableCell>{isAr ? 'ملاحظات' : 'Notes'}</TableCell>}
@@ -320,6 +341,16 @@ export default function SalesOrdersPage() {
             {orders.map((order) => (
               <TableRow key={order.id} hover>
                 {visibleColumns.orderNumber && <TableCell sx={{ fontWeight: 600 }}>{order.orderNumber}</TableCell>}
+                {visibleColumns.source && (
+                  <TableCell>
+                    <Chip
+                      label={order.source === 'WEBSITE' ? (isAr ? 'الموقع' : 'Website') : order.source === 'POS' ? 'POS' : (isAr ? 'مبيعات' : 'Sales')}
+                      size="small"
+                      color={order.source === 'WEBSITE' ? 'secondary' : order.source === 'POS' ? 'info' : 'default'}
+                      variant={order.source === 'WEBSITE' ? 'filled' : 'outlined'}
+                    />
+                  </TableCell>
+                )}
                 {visibleColumns.date && <TableCell>{formatDate(order.createdAt, 'PP')}</TableCell>}
                 {visibleColumns.customer && <TableCell>
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>{order.customer?.name}</Typography>
@@ -383,7 +414,7 @@ export default function SalesOrdersPage() {
                         <IconButton size="small" color="primary" onClick={() => navigate(`/sales/${order.id}/edit`)}>
                           <Edit size={16} />
                         </IconButton>
-                        {order.status === 'DRAFT' && (
+                        {(order.status === 'DRAFT' || order.status === 'PENDING') && (
                           <IconButton size="small" color="success" title="Confirm" onClick={() => handleConfirm(order.id)}>
                             <CheckCircle size={16} />
                           </IconButton>
@@ -449,6 +480,10 @@ export default function SalesOrdersPage() {
           <FormControlLabel
             control={<Checkbox checked={visibleColumns.orderNumber} onChange={() => handleColumnToggle('orderNumber')} />}
             label={isAr ? 'رقم الطلب' : 'Order #'}
+          />
+          <FormControlLabel
+            control={<Checkbox checked={!!visibleColumns.source} onChange={() => handleColumnToggle('source')} />}
+            label={isAr ? 'المصدر' : 'Source'}
           />
           <FormControlLabel
             control={<Checkbox checked={visibleColumns.date} onChange={() => handleColumnToggle('date')} />}
