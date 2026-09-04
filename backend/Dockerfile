@@ -9,8 +9,8 @@ COPY . .
 RUN npx prisma generate
 
 FROM node:20-alpine
-# Install openssl for prisma engines
-RUN apk add --no-cache openssl
+# Install openssl for prisma engines and bash for Dockploy terminal
+RUN apk add --no-cache openssl bash
 WORKDIR /app
 # Copy only the necessary files for production
 COPY --from=builder /app/node_modules ./node_modules
