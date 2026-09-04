@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -10,13 +8,13 @@ services:
       POSTGRES_USER: aman_user
       POSTGRES_PASSWORD: aman_pass
     ports:
-      - "5432:5432"
+      - "5444:5432"
     volumes:
       - postgres_dev_data:/var/lib/postgresql/data
     networks:
       - aman_dev_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U aman_user -d aman_erp_dev"]
+      test: [ "CMD-SHELL", "pg_isready -U aman_user -d aman_erp_dev" ]
       interval: 5s
       timeout: 3s
       retries: 10
