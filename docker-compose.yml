@@ -29,8 +29,8 @@ services:
       - .env
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-aman_user}:${POSTGRES_PASSWORD:-aman_pass}@postgres:5432/${POSTGRES_DB:-aman_erp}
-      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_ACCESS_SECRET: 4f7c1d8e2b3a9c6f5d0e7b4a1c8f3e2d5c0b9a6f8e4d2a1c0b3d8f5e7a9c6f2d
+      JWT_REFRESH_SECRET: a1b2c3d4e5f67890abcdef1234567890abcdef1234567890abcdef1234567890
       JWT_ACCESS_EXPIRES: ${JWT_ACCESS_EXPIRES:-15m}
       JWT_REFRESH_EXPIRES: ${JWT_REFRESH_EXPIRES:-7d}
       NODE_ENV: production
