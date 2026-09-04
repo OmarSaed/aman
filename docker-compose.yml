@@ -25,8 +25,6 @@ services:
       dockerfile: Dockerfile
     container_name: dongol_backend
     restart: unless-stopped
-    env_file:
-      - .env
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-aman_user}:${POSTGRES_PASSWORD:-aman_pass}@postgres:5432/${POSTGRES_DB:-aman_erp}
       JWT_ACCESS_SECRET: 4f7c1d8e2b3a9c6f5d0e7b4a1c8f3e2d5c0b9a6f8e4d2a1c0b3d8f5e7a9c6f2d
