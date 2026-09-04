@@ -3,7 +3,7 @@ version: '3.9'
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: aman_db
+    container_name: dongol_db
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-aman_erp}
